@@ -56,11 +56,12 @@ router.post('/', async function (req, res, next) {
       description: req.body.description,
       category: req.body.category
     })
+    //replica set
     let newProduct = await newItem.save({ session });
     console.log(newProduct);
     let newInventory = new InventoryModel({
       product: newProduct._id,
-      stock: -1
+      stock: 1
     })
     newInventory = await newInventory.save({ session });
     await newInventory.populate('product')

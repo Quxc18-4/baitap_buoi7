@@ -21,5 +21,7 @@ let inventorySchema = mongoose.Schema({
         min: 0,
         default: 0
     }
+}, {
+    timestamps: true
 })
 module.exports = new mongoose.model('inventory', inventorySchema)

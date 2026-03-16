@@ -2,7 +2,7 @@ var express = require("express");
 let userModel = require("../schemas/users");
 module.exports = {
     CreateAnUser: async function (username, password,
-        email, role, fullName, avatarUrl, status
+        email, role, fullName, avatarUrl, status,session
     ) {
         let newItem = new userModel({
             username: username,
@@ -14,7 +14,7 @@ module.exports = {
             status: status
 
         });
-        await newItem.save();
+        await newItem.save({session});
         return newItem;
     },
     FindByID: async function (id) {

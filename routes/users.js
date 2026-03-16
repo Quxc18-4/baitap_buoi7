@@ -3,17 +3,20 @@ var router = express.Router();
 let bcrypt = require('bcrypt')
 let { userPostValidation, validateResult } =
   require('../utils/validationHandler')
-let { checkLogin,checkRole } = require('../utils/authHandler')
+let { checkLogin, checkRole } = require('../utils/authHandler')
+let userModel = require('../schemas/users');
+let cartModel = require('../schemas/carts')
+let mongoose = require('mongoose')
 
 let userController = require("../controllers/users");
 
 
-router.get("/", checkLogin,checkRole("ADMIN") , async function (req, res, next) {
+router.get("/", checkLogin, checkRole("ADMIN"), async function (req, res, next) {
   let result = await userController.getAllUser();
   res.send(result)
 });
 
-router.get("/:id", checkLogin,checkRole("ADMIN","MODERATOR"), async function (req, res, next) {
+router.get("/:id", checkLogin, checkRole("ADMIN", "MODERATOR"), async function (req, res, next) {
   try {
     let result = await userController.FindByID(req.params.id)
     if (result) {
@@ -29,6 +32,8 @@ router.get("/:id", checkLogin,checkRole("ADMIN","MODERATOR"), async function (re
 
 router.post("/", userPostValidation, validateResult,
   async function (req, res, next) {
+    let session = await mongoose.startSession();
+    let transaction = session.startTransaction()
     try {
       let newItem = await userController.CreateAnUser(
         req.body.username,
@@ -36,12 +41,20 @@ router.post("/", userPostValidation, validateResult,
         req.body.email,
         req.body.role,
         "", "",
-        false
+        false,
+        session
       )
-      // populate cho đẹp
-      let saved = await userController.FindByID(newItem._id);
-      res.send(saved);
+      let newCart = new cartModel({
+        user: newItem._id
+      })
+      newCart = await newCart.save({ session })
+      await newCart.populate('user')
+      session.commitTransaction()
+      session.endSession()
+      res.send(newCart)
     } catch (err) {
+      session.abortTransaction();
+      session.endSession()
       res.status(400).send({ message: err.message });
     }
   });
