@@ -4,7 +4,6 @@ let reservationItems = mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'product',
         required: true,
-        unique: true
     },
     quantity: {
         type: Number,

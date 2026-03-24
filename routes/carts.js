@@ -13,6 +13,11 @@ router.post('/add-cart', checkLogin, async function (req, res, next) {
     let currentCart = await cartModel.findOne({
         user: req.userId
     })
+
+    if (!currentCart) {
+        currentCart = new cartModel({ user: req.userId, cartItems: [] });
+    }
+    
     let { product, quantity } = req.body;
     let getProduct = await inventoryModel.find({
         product: product
