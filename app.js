@@ -30,6 +30,7 @@ app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/roles', require('./routes/roles'));
 app.use('/auth', require('./routes/auth'));
+app.use('/carts', require('./routes/carts'));
 app.use('/products', require('./routes/products'));
 
 // catch 404 and forward to error handler
